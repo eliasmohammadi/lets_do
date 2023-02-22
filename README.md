@@ -12,6 +12,8 @@ In this project, I want to achieve the below goals and more.
 
 # Project Documentations
 
+### Development
+This project use jest as testing framework. see https://jestjs.io for details. 
 ### Getting started
 
 ### Testing
