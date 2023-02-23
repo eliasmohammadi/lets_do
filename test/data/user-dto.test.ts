@@ -3,11 +3,11 @@ import {RequireFieldException, ValidationException} from "../../src/data/excepti
 import {User} from "../../src/data/entity";
 import exp from "constants";
 
-describe('create user', () => {
+describe('User:create', () => {
 
     test('user without email or password is not validate',() => {
 
-        expect(() => new UserCreateDTO().create("",""))
+        expect(() => new UserCreateDTO().from("",""))
             .toThrow(
             new RequireFieldException(["email", "password"])
         );
@@ -16,7 +16,7 @@ describe('create user', () => {
     test("user creation failed when email has incorrect format", () => {
         const email: string = "incorrect_email_address";
         const password: string = "12345";
-        expect(() => new UserCreateDTO().create(email, password))
+        expect(() => new UserCreateDTO().from(email, password))
             .toThrow(
                 new ValidationException("email")
             )
@@ -25,7 +25,7 @@ describe('create user', () => {
     test("user created with email and password", () => {
         const email = "e@gmail.com"
         const password = "12345"
-        const user  = new UserCreateDTO().create(email, password)
+        const user  = new UserCreateDTO().from(email, password)
         expect(user).toBeInstanceOf(User)
         expect(user.email).toEqual(email)
     })
@@ -33,7 +33,7 @@ describe('create user', () => {
     test("password must be hash through user creation",() => {
         const email = "e@gmail.com";
         const password = "1234";
-        const user = new UserCreateDTO().create(email, password)
+        const user = new UserCreateDTO().from(email, password)
         expect(user.password).not.toEqual(password)
     })
 })
