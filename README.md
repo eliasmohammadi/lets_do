@@ -13,7 +13,9 @@ In this project, I want to achieve the below goals and more.
 # Project Documentations
 
 ### Development
-This project use jest as testing framework. see https://jestjs.io for details. 
-### Getting started
+In this project use jest as testing framework. see https://jestjs.io for details.
 
+In this project use Prisma as ORM.see https://www.prisma.io for details. 
+### Getting started
+ to install prisma client use : ```npx prisma generate``` 
 ### Testing

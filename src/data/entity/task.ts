@@ -56,4 +56,11 @@ export namespace Task {
         DOING,
         CLOSE
     }
+
+    export interface Options {
+        status: Task.Status,
+        description: string,
+        dueDate: Date,
+        owner: number
+    }
 }

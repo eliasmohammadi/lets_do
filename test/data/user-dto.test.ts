@@ -35,5 +35,6 @@ describe('User:create', () => {
         const password = "1234";
         const user = new UserCreateDTO().from(email, password)
         expect(user.password).not.toEqual(password)
+        expect(user.salt).toBeDefined()
     })
 })
