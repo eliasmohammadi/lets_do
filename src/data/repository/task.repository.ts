@@ -1,13 +1,51 @@
 import {Task} from "../entity";
+import {PrismaClient} from '@prisma/client'
+import {TaskCreateDTO, TaskInsertedDTO} from "../dto";
+import {ValidationException} from "../exception";
+import {getDate} from "../../utils";
 
 export interface ITaskRepository {
-    insert(task: Task): Promise<Task>
+    insert(taskDto: TaskCreateDTO): Promise<TaskInsertedDTO>
 }
-export class TaskRepository implements ITaskRepository{
-    constructor() {
+
+export class TaskRepository implements ITaskRepository {
+    constructor(private readonly db: PrismaClient) {
     }
-    insert(task: Task): Promise<Task> {
-        return Promise.resolve('' as unknown as Task);
+
+    createTask(taskDto: TaskCreateDTO): Task {
+        if (taskDto.title === "" || !taskDto.title)
+            throw new ValidationException("title")
+        const status = taskDto.options.status || Task.Status.OPEN
+        let dueDate = taskDto.options.dueDate || new Date()
+        const description = taskDto.options.description || ""
+        const owner = taskDto.options.owner || -1
+        return new Task(taskDto.title,
+            status,
+            getDate(dueDate),
+            description,
+            owner);
+    }
+
+    async insert(taskDto: TaskCreateDTO): Promise<TaskInsertedDTO> {
+        const task: Task = this.createTask(taskDto)
+        const insertedTask = await this.db.task.create({
+            data: {
+                title: task.title,
+                status: task.status,
+                description: task.description,
+                due_date: task.dueDate
+            }
+        })
+        return Promise.resolve(
+            new TaskInsertedDTO(
+                insertedTask.id,
+                insertedTask.title,
+                insertedTask.status,
+                insertedTask.due_date,
+                insertedTask.description,
+                insertedTask.user_id || -1,
+            )
+        )
     }
 
 }
