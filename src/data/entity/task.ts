@@ -1,5 +1,6 @@
 export class Task {
 
+    private _id : number = -1
     private _title: string
     private _dueDate: Date
     private _status : Task.Status
@@ -48,6 +49,14 @@ export class Task {
     }
     get status(): Task.Status {
         return this._status;
+    }
+
+    get id():number {
+        return this._id
+    }
+
+    set id(value: number) {
+        this._id = value
     }
 }
 export namespace Task {

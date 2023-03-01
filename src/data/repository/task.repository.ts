@@ -1,6 +1,6 @@
 import {Task} from "../entity";
 import {PrismaClient} from '@prisma/client'
-import {TaskCreateDTO, TaskInsertedDTO} from "../dto";
+import {TaskCreateDTO, TaskInsertedDTO, TaskUpdateDTO} from "../dto";
 import {ValidationException} from "../exception";
 import {getDate} from "../../utils";
 
@@ -46,6 +46,21 @@ export class TaskRepository implements ITaskRepository {
                 insertedTask.user_id || -1,
             )
         )
+    }
+
+    async updateTask(task: Partial<Task>): Promise<TaskUpdateDTO> {
+        const updatedTask = await this.db.task.update({
+            where:{
+                id: task.id
+            },data: task
+        })
+
+        return Promise.resolve(
+            new TaskUpdateDTO(
+                updatedTask as unknown as Task
+            )
+        )
+
     }
 
 }
