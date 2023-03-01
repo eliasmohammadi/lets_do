@@ -16,7 +16,7 @@ export class TaskRepository implements ITaskRepository {
         this.mapper = new Mapper()
     }
 
-    createTask(task: Partial<Task>): Task {
+    private _createTask(task: Partial<Task>): Task {
         if (task.title === "" || !task.title)
             throw new ValidationException("title")
         const status = task.status || Task.Status.OPEN
@@ -31,7 +31,7 @@ export class TaskRepository implements ITaskRepository {
     }
 
     async insert(task: Partial<Task>): Promise<TaskInsertDTO> {
-        const taskInstance: Task = this.createTask(task)
+        const taskInstance: Task = this._createTask(task)
         const insertedTask = await this.db.task.create({
             data: {
                 title: taskInstance.title,

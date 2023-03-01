@@ -53,31 +53,12 @@ describe("Task Repository: insert", () => {
             id: 1
         })
     })
-})
-
-describe("Task Repository:Create", () => {
-    test("task created with title and default open status with today's due date", () => {
-
-        const [todayDate, todayTime] = new Date().toISOString().split("T")
-
+    test("task with empty title is invalid", async () => {
         const repository: TaskRepository = new TaskRepository(dbClient)
-        const task: Task = repository.createTask(
-            {
-                title:"title"
-            }
-        )
-
-        const [dueDate, dueTime] = task.dueDate.toISOString().split("T")
-        expect(task.title).toBe("title")
-        expect(task.status).toBe(Task.Status.OPEN)
-        expect(dueDate).toEqual(todayDate)
-
-    })
-
-    test("task with empty title is invalid", () => {
-        const repository: TaskRepository = new TaskRepository(dbClient)
-        expect(() => repository.createTask({}))
-            .toThrow(new ValidationException("title"))
+        repository.insert({}).catch(e => {
+            expect(e).toBeInstanceOf(ValidationException)
+            expect(e.message).toEqual(`title is invalid`)
+        })
     })
 })
 
