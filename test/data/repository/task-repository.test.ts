@@ -17,11 +17,11 @@ jest.mock('../../../src/data/db/db.client', () => {
 import {Task} from "../../../src/data/entity"
 import {TaskRepository} from "../../../src/data/repository"
 import {dbClient} from '../../../src/data/db/db.client'
-import {TaskCreateDTO, TaskUpdateDTO} from "../../../src/data/dto";
+import {TaskDTO, TaskInsertDTO} from "../../../src/data/dto";
 import {ValidationException} from "../../../src/data/exception";
 
 describe("Task Repository: insert", () => {
-    it("should return TaskInsertedDTO object after insert task in database", async () => {
+    it("should return Task object after insert task in database", async () => {
         mockPrismaCreate.mockResolvedValue({
             id: 1,
             title: "title",
@@ -32,11 +32,11 @@ describe("Task Repository: insert", () => {
         })
 
         const repository: TaskRepository = new TaskRepository(dbClient)
-        const taskDto: TaskCreateDTO = new TaskCreateDTO(
-            "title"
-        )
+        const task: Partial<Task> = {
+            title:"title"
+        }
 
-        const result = await repository.insert(taskDto)
+        const result: TaskInsertDTO = await repository.insert(task)
 
 
         const createMethodInput = {
@@ -50,15 +50,8 @@ describe("Task Repository: insert", () => {
         expect(mockPrismaCreate).toHaveBeenCalledWith(createMethodInput)
         expect(mockPrismaCreate).toHaveBeenCalledTimes(1)
         expect(result).toEqual({
-            id: 1,
-            title: "title",
-            description: "",
-            userId: -1,
-            status: "OPEN",
-            dueDate: getDate(new Date()).toISOString()
+            id: 1
         })
-
-
     })
 })
 
@@ -69,7 +62,9 @@ describe("Task Repository:Create", () => {
 
         const repository: TaskRepository = new TaskRepository(dbClient)
         const task: Task = repository.createTask(
-            new TaskCreateDTO("title",)
+            {
+                title:"title"
+            }
         )
 
         const [dueDate, dueTime] = task.dueDate.toISOString().split("T")
@@ -81,16 +76,13 @@ describe("Task Repository:Create", () => {
 
     test("task with empty title is invalid", () => {
         const repository: TaskRepository = new TaskRepository(dbClient)
-        expect(() => repository.createTask(new TaskCreateDTO("")))
+        expect(() => repository.createTask({}))
             .toThrow(new ValidationException("title"))
     })
 })
 
 describe("Task Repository: update", () => {
     it("should return updated task", async () => {
-
-
-
         const repository: TaskRepository = new TaskRepository(dbClient);
         const updateObject: Partial<Task> = {
             id: 1,
@@ -108,7 +100,7 @@ describe("Task Repository: update", () => {
         })
 
 
-        const updatedTask: TaskUpdateDTO = await repository.updateTask(updateObject)
+        const updatedTask: TaskDTO = await repository.updateTask(updateObject)
 
         expect(updatedTask.status).toEqual("CLOSE")
         expect(updatedTask.description).toEqual(updateObject.description)

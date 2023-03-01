@@ -1,54 +1,55 @@
 import {Task} from "../entity";
 import {PrismaClient} from '@prisma/client'
-import {TaskCreateDTO, TaskInsertedDTO, TaskUpdateDTO} from "../dto";
+import {TaskDTO, TaskInsertDTO} from "../dto";
 import {ValidationException} from "../exception";
 import {getDate} from "../../utils";
+import { Mapper } from "../../utils/mapper";
 
 export interface ITaskRepository {
-    insert(taskDto: TaskCreateDTO): Promise<TaskInsertedDTO>
+    insert(task: Task): Promise<TaskInsertDTO>
+    updateTask(task: Partial<Task>): Promise<TaskDTO>
 }
 
 export class TaskRepository implements ITaskRepository {
+    private mapper: Mapper
     constructor(private readonly db: PrismaClient) {
+        this.mapper = new Mapper()
     }
 
-    createTask(taskDto: TaskCreateDTO): Task {
-        if (taskDto.title === "" || !taskDto.title)
+    createTask(task: Partial<Task>): Task {
+        if (task.title === "" || !task.title)
             throw new ValidationException("title")
-        const status = taskDto.options.status || Task.Status.OPEN
-        let dueDate = taskDto.options.dueDate || new Date()
-        const description = taskDto.options.description || ""
-        const owner = taskDto.options.owner || -1
-        return new Task(taskDto.title,
+        const status = task.status || Task.Status.OPEN
+        let dueDate = task.dueDate || new Date()
+        const description = task.description || ""
+        const owner = task.userId || -1
+        return new Task(task.title,
             status,
             getDate(dueDate),
             description,
             owner);
     }
 
-    async insert(taskDto: TaskCreateDTO): Promise<TaskInsertedDTO> {
-        const task: Task = this.createTask(taskDto)
+    async insert(task: Partial<Task>): Promise<TaskInsertDTO> {
+        const taskInstance: Task = this.createTask(task)
         const insertedTask = await this.db.task.create({
             data: {
-                title: task.title,
-                status: task.status,
-                description: task.description,
-                due_date: task.dueDate
+                title: taskInstance.title,
+                status: taskInstance.status,
+                description: taskInstance.description,
+                due_date: taskInstance.dueDate
             }
         })
         return Promise.resolve(
-            new TaskInsertedDTO(
-                insertedTask.id,
-                insertedTask.title,
-                insertedTask.status,
-                insertedTask.due_date,
-                insertedTask.description,
-                insertedTask.user_id || -1,
-            )
+            this.mapper.from<Task, TaskInsertDTO>(insertedTask as unknown as Task, (t) => {
+                return {
+                    id:t.id
+                }
+            })
         )
     }
 
-    async updateTask(task: Partial<Task>): Promise<TaskUpdateDTO> {
+    async updateTask(task: Partial<Task>): Promise<TaskDTO> {
         const updatedTask = await this.db.task.update({
             where:{
                 id: task.id
@@ -56,9 +57,16 @@ export class TaskRepository implements ITaskRepository {
         })
 
         return Promise.resolve(
-            new TaskUpdateDTO(
-                updatedTask as unknown as Task
-            )
+            this.mapper.from<Task, TaskDTO>(updatedTask as unknown as Task, (t) => {
+                return {
+                    id:t.id,
+                    userId:t.userId || -1,
+                    description:t.description || "",
+                    title: t.title,
+                    dueDate: t.dueDate.toISOString(),
+                    status: Task.Status[t.status]
+                }
+            })
         )
 
     }
