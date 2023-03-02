@@ -6,6 +6,7 @@ const mockPrismaDelete = jest.fn().mockResolvedValue({
     title:"title",
     id:1
 })
+const mockPrismaFind = jest.fn()
 
 jest.mock('../../../src/data/db/db.client', () => {
     return {
@@ -13,7 +14,8 @@ jest.mock('../../../src/data/db/db.client', () => {
             task: {
                 create: mockPrismaCreate,
                 update: mockPrismaUpdate,
-                delete: mockPrismaDelete
+                delete: mockPrismaDelete,
+                findMany: mockPrismaFind
             }
         }
     }
@@ -111,6 +113,32 @@ describe("Task Repository: delete",() => {
 
         expect(actual).toEqual({
             id:1
+        })
+    })
+} )
+
+describe("Task Repository: fetch",() => {
+    it("should return task dto for given predictions", async() => {
+        mockPrismaFind.mockResolvedValue(
+            {
+                id:1,
+                title:"title",
+                userId:1,
+                status:2,
+                description:"",
+                dueDate:getDate(new Date())
+            }
+        )
+        const prediction: Partial<Task> = {
+            userId: 1,
+            status:Task.Status.CLOSE,
+        }
+        const repository: TaskRepository = new TaskRepository(dbClient)
+        const actual = await repository.fetchBy(prediction);
+        expect(actual.userId).toEqual(prediction.userId)
+        expect(mockPrismaFind).toHaveBeenCalledTimes(1)
+        expect(mockPrismaFind).toHaveBeenCalledWith({
+            where:prediction
         })
     })
 } )
