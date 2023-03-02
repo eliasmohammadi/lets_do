@@ -1,17 +1,21 @@
 import {Task} from "../entity";
 import {PrismaClient} from '@prisma/client'
-import {TaskDTO, TaskInsertDTO} from "../dto";
+import {TaskDTO, TaskIdDTO} from "../dto";
 import {ValidationException} from "../exception";
 import {getDate} from "../../utils";
-import { Mapper } from "../../utils/mapper";
+import {Mapper} from "../../utils/mapper";
 
 export interface ITaskRepository {
-    insert(task: Task): Promise<TaskInsertDTO>
+    insert(task: Task): Promise<TaskIdDTO>
+
     updateTask(task: Partial<Task>): Promise<TaskDTO>
+
+    deleteTask(id: Task["id"]): Promise<TaskIdDTO>
 }
 
 export class TaskRepository implements ITaskRepository {
     private mapper: Mapper
+
     constructor(private readonly db: PrismaClient) {
         this.mapper = new Mapper()
     }
@@ -30,7 +34,7 @@ export class TaskRepository implements ITaskRepository {
             owner);
     }
 
-    async insert(task: Partial<Task>): Promise<TaskInsertDTO> {
+    async insert(task: Partial<Task>): Promise<TaskIdDTO> {
         const taskInstance: Task = this._createTask(task)
         const insertedTask = await this.db.task.create({
             data: {
@@ -41,9 +45,9 @@ export class TaskRepository implements ITaskRepository {
             }
         })
         return Promise.resolve(
-            this.mapper.from<Task, TaskInsertDTO>(insertedTask as unknown as Task, (t) => {
+            this.mapper.from<Task, TaskIdDTO>(insertedTask as unknown as Task, (t) => {
                 return {
-                    id:t.id
+                    id: t.id
                 }
             })
         )
@@ -51,17 +55,17 @@ export class TaskRepository implements ITaskRepository {
 
     async updateTask(task: Partial<Task>): Promise<TaskDTO> {
         const updatedTask = await this.db.task.update({
-            where:{
+            where: {
                 id: task.id
-            },data: task
+            }, data: task
         })
 
         return Promise.resolve(
             this.mapper.from<Task, TaskDTO>(updatedTask as unknown as Task, (t) => {
                 return {
-                    id:t.id,
-                    userId:t.userId || -1,
-                    description:t.description || "",
+                    id: t.id,
+                    userId: t.userId || -1,
+                    description: t.description || "",
                     title: t.title,
                     dueDate: t.dueDate.toISOString(),
                     status: Task.Status[t.status]
@@ -70,5 +74,18 @@ export class TaskRepository implements ITaskRepository {
         )
 
     }
-
+    async deleteTask(id: number): Promise<TaskIdDTO> {
+        const deletedItem = await this.db.task.delete({
+            where:{
+                id:id
+            }
+        }) as unknown as Task
+        return Promise.resolve(
+            this.mapper.from<Task, TaskIdDTO>(deletedItem,(t) => {
+                return {
+                    id:t.id
+                }
+            })
+        )
+    }
 }

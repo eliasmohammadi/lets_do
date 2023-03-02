@@ -2,13 +2,18 @@ import {getDate} from "../../../src/utils"
 
 const mockPrismaCreate = jest.fn()
 const mockPrismaUpdate = jest.fn()
+const mockPrismaDelete = jest.fn().mockResolvedValue({
+    title:"title",
+    id:1
+})
 
 jest.mock('../../../src/data/db/db.client', () => {
     return {
         dbClient: {
             task: {
                 create: mockPrismaCreate,
-                update: mockPrismaUpdate
+                update: mockPrismaUpdate,
+                delete: mockPrismaDelete
             }
         }
     }
@@ -17,7 +22,7 @@ jest.mock('../../../src/data/db/db.client', () => {
 import {Task} from "../../../src/data/entity"
 import {TaskRepository} from "../../../src/data/repository"
 import {dbClient} from '../../../src/data/db/db.client'
-import {TaskDTO, TaskInsertDTO} from "../../../src/data/dto";
+import {TaskDTO, TaskIdDTO} from "../../../src/data/dto";
 import {ValidationException} from "../../../src/data/exception";
 
 describe("Task Repository: insert", () => {
@@ -36,7 +41,7 @@ describe("Task Repository: insert", () => {
             title:"title"
         }
 
-        const result: TaskInsertDTO = await repository.insert(task)
+        const result: TaskIdDTO = await repository.insert(task)
 
 
         const createMethodInput = {
@@ -96,3 +101,16 @@ describe("Task Repository: update", () => {
 
     })
 })
+
+describe("Task Repository: delete",() => {
+    it("should delete task and return task id", async() => {
+
+        const repository: TaskRepository = new TaskRepository(dbClient)
+
+        const actual= await repository.deleteTask(1)
+
+        expect(actual).toEqual({
+            id:1
+        })
+    })
+} )

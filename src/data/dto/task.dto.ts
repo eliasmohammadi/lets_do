@@ -1,7 +1,7 @@
 import {Task} from "../entity";
 
 
-export type TaskInsertDTO = Pick<Task,'id'>
+export type TaskIdDTO = Pick<Task,'id'>
 
 export type TaskDTO = {
     id: Task['id']
