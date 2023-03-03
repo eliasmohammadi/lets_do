@@ -1,5 +1,5 @@
 export class Mapper {
-    from<T, U>(t:T,cb:Mapper.MapFunction<T, U>): U {
+    static from<T, U>(t:T,cb:Mapper.MapFunction<T, U>): U {
         return cb(t)
     }
 }

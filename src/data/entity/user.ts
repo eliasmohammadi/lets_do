@@ -1,20 +1,28 @@
 export class User {
+    private _id: number = -1
     private readonly _email: string
-    private readonly hashPassword: string
+    private readonly _hashPassword: string
     private _name: string = ""
-    private _salt : string = ""
-    constructor(email: string, salt: string, hashPassowrd: string) {
+    private readonly _salt : string = ""
+    constructor(email: string, salt: string, hashPassword: string) {
         this._email = email
-        this.hashPassword = hashPassowrd
+        this._hashPassword = hashPassword
         this._salt = salt
         
+    }
+
+    get id():number {
+        return this._id
+    }
+    set id(value: number) {
+        this._id = value
     }
 
     get email():string {
         return this._email
     }
-    get password(): string {
-        return this.hashPassword
+    get hashPassword(): string {
+        return this._hashPassword
     }
 
     set name(value: string) {

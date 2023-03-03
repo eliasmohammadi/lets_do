@@ -16,7 +16,7 @@ describe("Mapper", () => {
             last_name: "Mohammadi"
         }
 
-        const actual = new Mapper().from<FirstType, SecondType>(obj,(o) => {
+        const actual = Mapper.from<FirstType, SecondType>(obj,(o) => {
             return {
                 fullName: `${o.first_name} ${o.last_name}`
             }

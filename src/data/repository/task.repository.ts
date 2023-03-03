@@ -17,10 +17,10 @@ export interface ITaskRepository {
 }
 
 export class TaskRepository implements ITaskRepository {
-    private mapper: Mapper
+
 
     constructor(private readonly db: PrismaClient) {
-        this.mapper = new Mapper()
+
     }
 
     private _createTask(task: Partial<Task>): Task {
@@ -48,7 +48,7 @@ export class TaskRepository implements ITaskRepository {
             }
         })
         return Promise.resolve(
-            this.mapper.from<Task, TaskIdDTO>(insertedTask as unknown as Task, (t) => {
+            Mapper.from<Task, TaskIdDTO>(insertedTask as unknown as Task, (t) => {
                 return {
                     id: t.id
                 }
@@ -64,7 +64,7 @@ export class TaskRepository implements ITaskRepository {
         })
 
         return Promise.resolve(
-            this.mapper.from<Task, TaskDTO>(updatedTask as unknown as Task, (t) => {
+            Mapper.from<Task, TaskDTO>(updatedTask as unknown as Task, (t) => {
                 return {
                     id: t.id,
                     userId: t.userId || -1,
@@ -84,7 +84,7 @@ export class TaskRepository implements ITaskRepository {
             }
         }) as unknown as Task
         return Promise.resolve(
-            this.mapper.from<Task, TaskIdDTO>(deletedItem,(t) => {
+            Mapper.from<Task, TaskIdDTO>(deletedItem,(t) => {
                 return {
                     id:t.id
                 }
@@ -98,7 +98,7 @@ export class TaskRepository implements ITaskRepository {
         }) as unknown as Task
 
         return Promise.resolve(
-            this.mapper.from<Task, TaskDTO>(task , t => {
+            Mapper.from<Task, TaskDTO>(task , t => {
                 return {
                     id: t.id,
                     title: t.title,
