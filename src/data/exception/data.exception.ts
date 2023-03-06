@@ -9,3 +9,9 @@ export class ValidationException extends Error {
         super(`${field} is invalid`);
     }
 }
+
+export class DuplicateRecordException extends Error {
+    constructor(fields: string[]) {
+        super(`${fields} must be unique`);
+    }
+}

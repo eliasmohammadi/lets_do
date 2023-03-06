@@ -2,7 +2,6 @@ export class User {
     private _id: number = -1
     private readonly _email: string
     private readonly _hashPassword: string
-    private _name: string = ""
     private readonly _salt : string = ""
     constructor(email: string, salt: string, hashPassword: string) {
         this._email = email
@@ -25,13 +24,6 @@ export class User {
         return this._hashPassword
     }
 
-    set name(value: string) {
-        this._name = value
-    }
-
-    get name(): string {
-        return this._name
-    }
     get salt(): string {
         return this._salt
     }
