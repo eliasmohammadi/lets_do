@@ -1,16 +1,18 @@
 import express from 'express'
 import UserRouter from './api/user.controller'
+import TaskRouter from './api/task.controller'
 import http, {Server} from 'http'
 
 const app = express()
 app.use(express.json())
 const PORT = process.env.PORT || 3000
 app.use('/api', UserRouter)
+app.use('/api', TaskRouter)
 
 
 
 export class ServerRunner {
-    server:Server | null = null
+    private server:Server | null = null
     connect() {
         this.server = http.createServer(app)
         this.server.listen(PORT)
@@ -23,4 +25,4 @@ export class ServerRunner {
 
 }
 
-export default app
+export default new ServerRunner()

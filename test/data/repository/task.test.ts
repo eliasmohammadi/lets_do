@@ -120,14 +120,14 @@ describe("Task Repository: delete",() => {
 describe("Task Repository: fetch",() => {
     it("should return task dto for given predictions", async() => {
         mockPrismaFind.mockResolvedValue(
-            {
+            [{
                 id:1,
                 title:"title",
-                userId:1,
+                user_id:1,
                 status:2,
-                description:"",
-                dueDate:getDate(new Date())
-            }
+                description:"has some description",
+                due_date:getDate(new Date())
+            }]
         )
         const prediction: Partial<Task> = {
             userId: 1,
@@ -135,7 +135,7 @@ describe("Task Repository: fetch",() => {
         }
         const repository: TaskRepository = new TaskRepository(dbClient)
         const actual = await repository.fetchBy(prediction);
-        expect(actual.userId).toEqual(prediction.userId)
+        expect(actual[0].userId).toEqual(prediction.userId)
         expect(mockPrismaFind).toHaveBeenCalledTimes(1)
         expect(mockPrismaFind).toHaveBeenCalledWith({
             where:prediction

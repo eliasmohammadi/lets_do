@@ -1,20 +1,18 @@
-import {ServerRunner} from '../../src/app'
+import server from '../../src/app'
 import supertest, {SuperAgentTest} from 'supertest'
 
 import {PrismaClient} from '@prisma/client'
 
 
 describe("User Api", () => {
-
-    const serverRunner = new ServerRunner()
     let request: SuperAgentTest
     beforeAll(() => {
-        request = supertest.agent(serverRunner.connect())
+        request = supertest.agent(server.connect())
     })
 
     afterAll((done) => {
         new PrismaClient().user.deleteMany({}).then(res => {})
-        serverRunner.disconnect()
+        server.disconnect()
         done()
     })
 

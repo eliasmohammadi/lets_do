@@ -12,7 +12,7 @@ export interface ITaskRepository {
 
     deleteTask(id: Task["id"]): Promise<TaskIdDTO>
 
-    fetchBy(prediction: Partial<Task>): Promise<TaskDTO>
+    fetchBy(prediction: Partial<Task>): Promise<TaskDTO[]>
 
 }
 
@@ -92,21 +92,24 @@ export class TaskRepository implements ITaskRepository {
         )
     }
 
-    async fetchBy(prediction: Partial<Task>): Promise<TaskDTO> {
-        const task = await this.db.task.findMany({
+    async fetchBy(prediction: Partial<Task>): Promise<TaskDTO[]> {
+        const  tasksPrisma = await this.db.task.findMany({
             where:prediction
-        }) as unknown as Task
+        })
 
         return Promise.resolve(
-            Mapper.from<Task, TaskDTO>(task , t => {
-                return {
-                    id: t.id,
-                    title: t.title,
-                    description: t.description,
-                    userId:t.userId,
-                    status:Task.Status[t.status],
-                    dueDate: t.dueDate.toISOString()
-                }
+            Mapper.from<typeof tasksPrisma, TaskDTO[]>(tasksPrisma , t => {
+                return t.map(o => {
+                    return {
+                        id: o.id,
+                        title: o.title,
+                        description: o.description,
+                        userId:o.user_id,
+                        status:Task.Status[o.status],
+                        dueDate: o.due_date.toISOString()
+                    }
+                })
+
             })
         )
     }
