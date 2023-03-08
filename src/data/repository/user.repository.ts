@@ -18,10 +18,6 @@ export class UserRepository implements IUserRepository {
     }
 
     async insert(email: string, password: string): Promise<UserIdDTO> {
-        // hash password
-        // generate salt
-        // validate email
-
         if (!email || !password)
             throw new RequireFieldException(["email", "password"])
         if (!validateEmail(email))

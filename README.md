@@ -19,3 +19,4 @@ In this project use Prisma as ORM.see https://www.prisma.io for details.
 ### Getting started
  to install prisma client use : ```npx prisma generate``` 
 ### Testing
+to run test use: ```npm test```
