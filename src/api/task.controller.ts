@@ -33,4 +33,16 @@ router.route("/task/:id")
         return res.status(200).send(result)
     })
 
+router.route("/task/:id")
+    .put(async (req: Request, res:Response) => {
+        const {id}  = req.params
+        const data = req.body
+        const taskRepository = new TaskRepository(dbClient)
+        const result = await taskRepository.updateTask({
+            id:+id,
+            ...data
+        })
+        return res.status(200).send(result)
+    })
+
 export default router

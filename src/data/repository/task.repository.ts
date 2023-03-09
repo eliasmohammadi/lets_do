@@ -57,6 +57,8 @@ export class TaskRepository implements ITaskRepository {
     }
 
     async updateTask(task: Partial<Task>): Promise<TaskDTO> {
+
+
         const updatedTask = await this.db.task.update({
             where: {
                 id: task.id
@@ -64,13 +66,13 @@ export class TaskRepository implements ITaskRepository {
         })
 
         return Promise.resolve(
-            Mapper.from<Task, TaskDTO>(updatedTask as unknown as Task, (t) => {
+            Mapper.from<typeof updatedTask, TaskDTO>(updatedTask, (t) => {
                 return {
                     id: t.id,
-                    userId: t.userId || -1,
+                    userId: t.user_id || -1,
                     description: t.description || "",
                     title: t.title,
-                    dueDate: t.dueDate.toISOString(),
+                    dueDate: t.due_date.toISOString(),
                     status: Task.Status[t.status]
                 }
             })

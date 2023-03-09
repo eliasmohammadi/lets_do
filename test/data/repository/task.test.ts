@@ -83,8 +83,8 @@ describe("Task Repository: update", () => {
             description: updateObject.description,
             status: 2,
             title:"title",
-            userId:-1,
-            dueDate:getDate(new Date())
+            user_id:-1,
+            due_date:getDate(new Date())
         })
 
 
